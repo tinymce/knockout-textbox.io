@@ -1,12 +1,13 @@
-#angular-textbox.io
+#knockout-textbox.io
 
 ##What does this do?
 
 ###tl;dr
-`knockout-textbox.io` provides a Knockout Binding that allows the Textbox.io WYSIWYG Rich Text Editor to be part of your `<form>`.
+`knockout-textbox.io` provides a Knockout Binding that allows the Textbox.io WYSIWYG Rich Text Editor to be part of your `<form>` and participate
+in data binding like a normal `<form>` element would participate.
 
 ##Requirements
-* Knockout **3.x** *
+* Knockout **3.x**
 * Textbox.io **1.2+**
 
 If you need to use this with earlier releases of Knockout please contact us at <mailto:support@ephox.com>.
@@ -18,46 +19,29 @@ Implementing this custom binding is straightforward and simple.
 Textbox.io itself has a set of files that need to be available in your application in order for the directive to function properly.  When you download Textbox.io you need to place the `textboxio` folder somewhere that is accessible to the user's browser at runtime.  You need to make sure you have a `<script>` tag in your page that loads the `textboxio.js` JavaScript file.  The remainder of this document assumes the Textbox.io files are in a web-accessible location and you already have a `<script>` tag in place loading the `textboxio.js` JavaScript file
 
 ####Add the files from knockout-textbox.io to your project
-The 2 files provided need to be available to your application.  Where you place them is up to you and there seems to be a multitude of "best practices" for how to organize your files in a web application that uses Knockout.  The provided files are built for apps that use `require.js` for organizing their JavaScript files.  This format is not required but is used (for example) in Durandal which is a popular SPA framework for use with Durandal.
+The 2 files provided need to be available to your application.  Where you place them is up to you and there seems to be a multitude of "best practices" for how to organize your files in a web application that uses Knockout.  The provided files are built for apps that use `require.js` for organizing their JavaScript files.  This format is not required but is used (for example) in Durandal which is a popular SPA framework for use with Knockout.
 
-We will not attempt to tell you **where** to place the files but make sure you load the files in your main html page!
+**If you are using require.js** please make sure that you include the two provided JavaScript files in your `requirejs.config` and that you make them available as dependencies in any page that needs Textbox.io.
 
-####Add a `ephox.textboxio` module dependency to your application's module
-For example, if your main module was called `blogApp` you would define `blogApp` in this fashion:
+**If you are not using require.js** you should be able to take the `bindingHandler` and `configurations` from these files and add them to your project as normal JavaScript.  IF you are unclear how to re-organize the files provided please contact us at <mailto:support@ephox.com>.
 
-`angular.module('blogApp', ['ngRoute', 'ephox.textboxio']);`
+####Data bind a `<textarea>` or `<div>` to the `bindingHandler`
+The `bindingHandler` needs to be bound to a `<textarea>` or `<div>` within your form that uses Knockout.  For example:
 
-...where the array defines required modules.
+```
+<textarea data-bind="textboxio:teaserContent, configuration:'simple'" rows="10" class="form-control" id="teaserContent" name="teaserContent"></textarea>
+```
 
-####Add the `tbio` attribute to a `<textarea>` in your form.
-To turn a regular `<textarea>` into a Textbox.io editor instance you must add the `tbio` attribute to the `<textarea>`.  The minimum required tag would then look like this:
-
-`<textarea tbio ng-model=“your.model.reference” rows=“15” id=“tbioTextArea” name=“tbioTextArea” ></textarea>`
-
-**Make sure you do not have any space or text between the opening and closing `<textarea>` tags** - doing so will cause issues with loading data into Textbox.io.  It will also trigger an automatic failure of the `tbio-required` validation.
-
-*Note:  Each `<textarea>` must have a unique `id` attribute as that is how the directive locates the `<textarea>` in the DOM.*
-
-####The **configuration** attribute *(optional - but not really optional)*
-The Directive supports the use of a `configuration` attribute on the `<textarea>` tag.  This allows you to pass a String that the directive will use to find a valid configuration for the editor.  If you don’t use this attribute the editor will open with its default configuration (almost never what you really want).
-
-`<textarea tbio ng-model=“your.model.reference” configuration=“simple” rows=“15” id=“tbioTextArea” name=“tbioTextArea” ></textarea>`
-
-…where `simple` is a Sting that matches the name of one of the properties defined in the `tbioConfigFactory.js` file.  The sample `tbioConfigFactory.js` file includes two properties as examples of how this should work.  The `configuration` parameter's value must match the name of a propery created in the `tbioConfigFactory.js` file.
+The `textboxio:teaserContent` portion of the data-bind tells Knockout to use this `bindingHandler` for the `<textarea>` - this is what causes Textbox.io to appear.  The `configuration:'simple'` portion of the data-bind tells the binding handler to load a Textbox.io configuration property named "simple" from the `configurations` object.  The configuration data-bind is purely optional but we expect that most people will want to provide a configuration file for Textbox.io that meets their specific needs.
 
 
 ##The complete details on what this does
 ####(when tl;dr is not enough!)
-AngularJS provides a built in two-way data binding between form (view) elements and the underlying (data) model.  While this works well for standard form elements, AngularJS does not know how to interact with Textbox.io.
+Knockout provides a built in two-way data binding between form (view) elements and the underlying (data) model.  While this works well for standard form elements, Knockout does not know how to interact with Textbox.io.
 
-This is primarily due to the fact that Textbox.io “hides” the form field (`<textarea>`) and superimposes an iFrame over the form field.  This means that when you are typing into Textbox.io you are not updating an AngularJS aware view so the underlying model is not updated.  When the form is submitted, the content of Textbox.io is not included.
+This is primarily due to the fact that Textbox.io “hides” the form field (`<textarea>`) and superimposes an iFrame over the form field.  This means that when you are typing into Textbox.io you are not updating a Knockout aware view so the underlying model is not updated.  When the form is submitted, the content of Textbox.io would not be included.
 
-This set of AngularJS Directives and Factories solves this issue by managing the process of...
+This Knockout binding handler solves this issue by managing the process of...
 
 * Deploying Textbox.io to the page
-* Managing the sync of data between Textbox.io and the AngularJS view and model objects
-* Allowing for validation of content in the editor
- * required (via `tbio-required` attribute)
- * minimum chars of text (via `tbio-minlength` attribute)
- * maximum chars of text (via `tbio-maxlength` attribute)
-* Allowing for developer-defined custom validation functions to be added to the $validators pipeline for all Textbox.io instances
+* Managing the sync of data between Textbox.io and the Knockout model object
