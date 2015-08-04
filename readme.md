@@ -23,7 +23,7 @@ The 2 files provided need to be available to your application.  Where you place 
 
 **If you are using require.js** please make sure that you include the two provided JavaScript files in your `requirejs.config` and that you make them available as dependencies in any page that needs Textbox.io.
 
-**If you are not using require.js** you should be able to take the `bindingHandler` and `configurations` from these files and add them to your project as normal JavaScript.  IF you are unclear how to re-organize the files provided please contact us at <mailto:support@ephox.com>.
+**If you are not using require.js** you should be able to take the `bindingHandler` and `configurations` from these files and add them to your project as normal JavaScript.  If you are unclear how to re-organize the files provided please contact us at <mailto:support@ephox.com>.
 
 ####Data bind a `<textarea>` or `<div>` to the `bindingHandler`
 The `bindingHandler` needs to be bound to a `<textarea>` or `<div>` within your form that uses Knockout.  For example:
